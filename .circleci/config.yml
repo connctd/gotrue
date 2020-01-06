@@ -3,16 +3,30 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.13
+    working_directory: ~/project/gotrue
     steps:
-      - checkout
+      - checkout:
+          path: ~/project
       - run: git submodule sync
       - run: git submodule update --init
       - setup_remote_docker
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run:
-          working_directory: ~/project/gotrue
+          name: Build image
           command: make image
+      - run:
+          name: Build image
+          command: docker build -t connctd/gotrue:latest -t connctd/gotrue:$(git rev-parse HEAD) .
+      - run:
+          name: Push image
+          command: |
+              docker push connctd/gotrue:latest
+              docker push connctd/gotrue:$(git rev-parse HEAD)
 workflows:
   version: 2
   build:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only: master
