@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gotrue.fullname" . }}
+  labels:
+{{ include "gotrue.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.env.PORT }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "gotrue.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
