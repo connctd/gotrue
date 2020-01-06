@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - setup_remote_docker
+      - run:
+          working_directory: ~/project/gotrue
+          command: make image
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
